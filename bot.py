@@ -3,7 +3,7 @@ from google import genai
 import telebot
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "8685930917:AAH86k8oQYjsKYa3_-jpkVdEPhGRyD1-9Rk")
-GEMINI_KEY = os.environ.get("GEMINI_KEY", "AIzaSyB2JVUymv_Jux1ndSCXUAc6bcXNYvS3INo")
+GEMINI_KEY = os.environ.get("GEMINI_KEY", "AIzaSyD32cO5qAhz6eGnavFWJlUc490TffkWXbE")
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "@pikmuxa_ai")
 
 bot = telebot.TeleBot(BOT_TOKEN)
