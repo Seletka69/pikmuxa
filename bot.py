@@ -7,7 +7,7 @@ GEMINI_KEY = os.environ.get("GEMINI_KEY", "AIzaSyBD5sNtS1FM0SZ9Ui3MhVWfKUCzHKJZs
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "@pikmuxa_ai")
 
 bot = telebot.TeleBot(BOT_TOKEN)
-client = genai.Client(api_key=GEMINI_KEY)
+client = genai.Client(api_key="AIzaSy...твой_ключ_целиком")
 
 SYSTEM_PROMPT = """
 Ты — пикми-нейропомощница. Отвечаешь с иронией, 
