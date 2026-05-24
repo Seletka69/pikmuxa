@@ -1,14 +1,13 @@
 import os
+from google import genai
 import telebot
-import google.generativeai as genai
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "8685930917:AAH86k8oQYjsKYa3_-jpkVdEPhGRyDI-9Rk")
-GEMINI_KEY = os.environ.get("GEMINI_KEY", "AIzaSyBDSsNtS1FM0SZ9Ui3MhVwFKUCzHKJZsMo")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8685930917:AAH86k8oQYjsKYa3_-jpkVdEPhGRyD1-9Rk")
+GEMINI_KEY = os.environ.get("GEMINI_KEY", "AIzaSyBD5sNtS1FM0SZ9Ui3MhVWfKUCzHKJZsMo")
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "@pikmuxa_ai")
 
 bot = telebot.TeleBot(BOT_TOKEN)
-genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel("gemini-2.0-flash")
+client = genai.Client(api_key=GEMINI_KEY)
 
 SYSTEM_PROMPT = """
 Ты — пикми-нейропомощница. Отвечаешь с иронией, 
@@ -37,25 +36,28 @@ def start(message):
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
+    import random
     user_id = message.from_user.id
     print(f"Сообщение от {user_id}: {message.text}")
-    
-    subscribed = is_subscribed(user_id)
-    print(f"Подписан: {subscribed}")
-    
-    if not subscribed:
-        bot.send_message(message.chat.id,
-            "подпишись сначала 🙄\n"
-            f"➜ {CHANNEL_ID}\n\n"
-            "потом можем поговорить ★"
-        )
+
+    if not is_subscribed(user_id):
+        phrases = [
+            f"ну типа я бы поговорила но… подпишись сначала 🎀\n➜ {CHANNEL_ID}",
+            f"не, ну я не такая чтобы со всеми общаться 🙄\n➜ {CHANNEL_ID}",
+            f"другие боты может и так болтают, но я — нет ★\n➜ {CHANNEL_ID}",
+            f"мне просто комфортнее с теми кто подписан 💔\n➜ {CHANNEL_ID}",
+            f"ты серьёзно думал что я вот так просто отвечу? 🥀\n➜ {CHANNEL_ID}",
+        ]
+        bot.send_message(message.chat.id, random.choice(phrases))
         return
-    
+
     bot.send_chat_action(message.chat.id, "typing")
-    
+
     try:
-        prompt = SYSTEM_PROMPT + "\nПользователь: " + message.text
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=SYSTEM_PROMPT + "\nПользователь: " + message.text
+        )
         bot.send_message(message.chat.id, response.text)
     except Exception as e:
         print(f"Ошибка Gemini: {e}")
