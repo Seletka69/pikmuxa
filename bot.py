@@ -1,13 +1,14 @@
 import os
-from google import genai
 import telebot
+import random
+from groq import Groq
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "8685930917:AAH86k8oQYjsKYa3_-jpkVdEPhGRyD1-9Rk")
-GEMINI_KEY = os.environ.get("GEMINI_KEY", "AIzaSyD32cO5qAhz6eGnavFWJlUc490TffkWXbE")
+GROQ_KEY = os.environ.get("GROQ_KEY", "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")
 CHANNEL_ID = os.environ.get("CHANNEL_ID", "@pikmuxa_ai")
 
 bot = telebot.TeleBot(BOT_TOKEN)
-client = genai.Client(api_key="AIzaSy...твой_ключ_целиком")
+client = Groq(api_key=GROQ_KEY)
 
 SYSTEM_PROMPT = """
 Ты — пикми-нейропомощница. Отвечаешь с иронией, 
@@ -36,7 +37,6 @@ def start(message):
 
 @bot.message_handler(func=lambda m: True)
 def handle(message):
-    import random
     user_id = message.from_user.id
     print(f"Сообщение от {user_id}: {message.text}")
 
@@ -54,13 +54,16 @@ def handle(message):
     bot.send_chat_action(message.chat.id, "typing")
 
     try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=SYSTEM_PROMPT + "\nПользователь: " + message.text
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": message.text}
+            ]
         )
-        bot.send_message(message.chat.id, response.text)
+        bot.send_message(message.chat.id, response.choices[0].message.content)
     except Exception as e:
-        print(f"Ошибка Gemini: {e}")
+        print(f"Ошибка Groq: {e}")
         bot.send_message(message.chat.id, "что-то пошло не так, попробуй позже")
 
 bot.infinity_polling()
